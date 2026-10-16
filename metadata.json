@@ -1,0 +1,6 @@
+{
+  "name": "NetPrint Hub - Cyber Cafe Pay & Print Kiosk",
+  "description": "Multi-region cloud print kiosk for net cafes. Scan QR code to upload, customize duplex/color preferences with dynamic demand pricing, pay via integrated digital wallet, track live print queues, and monitor ink levels.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
