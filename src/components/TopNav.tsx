@@ -1,5 +1,5 @@
 import React from 'react';
-import { Region, RegionId } from '../types';
+import { Region } from '../types';
 import { 
   Printer, 
   Wallet, 
@@ -8,10 +8,9 @@ import {
   ShieldCheck, 
   Star, 
   QrCode,
-  Globe,
-  ChevronDown,
+  MapPin,
   History,
-  Receipt
+  Camera
 } from 'lucide-react';
 import { formatCurrency } from '../services/dynamicPricing';
 
@@ -20,9 +19,8 @@ interface TopNavProps {
   setActiveTab: (tab: 'upload' | 'tracker' | 'history' | 'wallet' | 'admin' | 'feedback') => void;
   walletBalanceUSD: number;
   currentRegion: Region;
-  regions: Region[];
-  onSelectRegion: (regionId: RegionId) => void;
   onOpenQrModal: () => void;
+  onOpenLiveScanner: () => void;
   onOpenTopUp: () => void;
   activeJobsCount: number;
   stationId: string;
@@ -33,36 +31,45 @@ export const TopNav: React.FC<TopNavProps> = ({
   setActiveTab,
   walletBalanceUSD,
   currentRegion,
-  regions,
-  onSelectRegion,
   onOpenQrModal,
+  onOpenLiveScanner,
   onOpenTopUp,
   activeJobsCount,
   stationId,
 }) => {
-  const [regionDropdownOpen, setRegionDropdownOpen] = React.useState(false);
-
   return (
     <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-xs">
-      {/* Upper micro-bar for regional network telemetry */}
+      {/* Upper micro-bar for SYAM NET WORLD local cafe status */}
       <div className="bg-slate-900 text-slate-300 text-xs py-1 px-4 sm:px-6">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-2">
             <span className="inline-block w-2 h-2 rounded-full bg-emerald-400"></span>
-            <span className="font-medium text-white">{currentRegion.name}</span>
+            <span className="font-semibold text-white">SYAM NET WORLD</span>
             <span className="text-slate-500">·</span>
-            <span className="text-slate-400 font-mono text-[11px]">{currentRegion.edgeNode}</span>
-            <span className="text-slate-500">·</span>
-            <span className="text-emerald-400 font-mono text-[11px]">{currentRegion.latencyMs}ms latency</span>
+            <span className="text-slate-300 flex items-center gap-1">
+              <MapPin className="w-3 h-3 text-amber-400" />
+              <span>Nuzvidu, Andhra Pradesh</span>
+            </span>
+            <span className="text-slate-500 hidden sm:inline">·</span>
+            <span className="text-emerald-400 font-mono text-[11px] hidden sm:inline">Local LAN Spooler 2ms</span>
           </div>
-          <div className="flex items-center gap-4 text-slate-400">
-            <span className="hidden sm:inline">Active Terminal: <strong className="text-white font-mono">{stationId}</strong></span>
+          <div className="flex items-center gap-3 text-slate-400">
+            <span className="hidden sm:inline">Active Station: <strong className="text-white font-mono">{stationId}</strong></span>
+            <button
+              onClick={onOpenLiveScanner}
+              className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 hover:text-white transition-colors cursor-pointer text-[11px] font-semibold"
+              title="Open camera to scan QR code"
+            >
+              <Camera className="w-3 h-3 text-emerald-400" />
+              <span>Camera Scan</span>
+            </button>
             <button
               onClick={onOpenQrModal}
-              className="inline-flex items-center gap-1.5 text-slate-300 hover:text-white transition-colors cursor-pointer"
+              className="inline-flex items-center gap-1 text-slate-300 hover:text-white transition-colors cursor-pointer text-[11px]"
+              title="Show desk QR code for smartphones"
             >
-              <QrCode className="w-3.5 h-3.5 text-amber-400" />
-              <span>Station QR Code</span>
+              <QrCode className="w-3 h-3 text-amber-400" />
+              <span>Desk QR</span>
             </button>
           </div>
         </div>
@@ -76,15 +83,15 @@ export const TopNav: React.FC<TopNavProps> = ({
             onClick={() => setActiveTab('upload')}
             className="flex items-center gap-2.5 cursor-pointer group"
           >
-            <div className="w-9 h-9 rounded-lg bg-indigo-600 flex items-center justify-center text-white shadow-xs group-hover:bg-indigo-700 transition-colors">
+            <div className="w-9 h-9 rounded-xl bg-emerald-600 flex items-center justify-center text-white shadow-xs group-hover:bg-emerald-700 transition-colors">
               <Printer className="w-5 h-5" />
             </div>
             <div>
-              <span className="font-bold text-lg tracking-tight text-slate-900 leading-none block">
-                NetPrint Hub
+              <span className="font-extrabold text-lg tracking-tight text-slate-900 leading-none block">
+                SYAM NET WORLD
               </span>
-              <span className="text-[11px] text-slate-500 font-medium leading-none block mt-0.5">
-                Cyber Cafe Smart Kiosk
+              <span className="text-[11px] text-emerald-700 font-semibold leading-none block mt-0.5">
+                Nuzvidu Pay & Print
               </span>
             </div>
           </div>
@@ -100,8 +107,8 @@ export const TopNav: React.FC<TopNavProps> = ({
                 : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
             }`}
           >
-            <UploadCloud className="w-4 h-4 text-indigo-600" />
-            <span>Kiosk Upload</span>
+            <UploadCloud className="w-4 h-4 text-emerald-600" />
+            <span>Upload Document</span>
           </button>
 
           <button
@@ -112,8 +119,8 @@ export const TopNav: React.FC<TopNavProps> = ({
                 : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
             }`}
           >
-            <ListOrdered className="w-4 h-4 text-emerald-600" />
-            <span>Live Tracker</span>
+            <ListOrdered className="w-4 h-4 text-indigo-600" />
+            <span>Live Spooler</span>
             {activeJobsCount > 0 && (
               <span className="ml-1 px-1.5 py-0.2 text-[11px] font-mono font-bold bg-amber-500 text-white rounded-full">
                 {activeJobsCount}
@@ -129,7 +136,7 @@ export const TopNav: React.FC<TopNavProps> = ({
                 : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
             }`}
           >
-            <History className="w-4 h-4 text-indigo-600" />
+            <History className="w-4 h-4 text-slate-700" />
             <span>Print History</span>
           </button>
 
@@ -142,7 +149,7 @@ export const TopNav: React.FC<TopNavProps> = ({
             }`}
           >
             <Wallet className="w-4 h-4 text-blue-600" />
-            <span>Digital Wallet</span>
+            <span>UPI & Wallet</span>
           </button>
 
           <button
@@ -154,7 +161,7 @@ export const TopNav: React.FC<TopNavProps> = ({
             }`}
           >
             <ShieldCheck className="w-4 h-4 text-purple-600" />
-            <span>Admin Queue & Ink</span>
+            <span>Operator Desk</span>
           </button>
 
           <button
@@ -166,70 +173,31 @@ export const TopNav: React.FC<TopNavProps> = ({
             }`}
           >
             <Star className="w-4 h-4 text-amber-500 fill-amber-500/20" />
-            <span>Service Quality</span>
+            <span>Reviews</span>
           </button>
         </nav>
 
-        {/* Zone 3: Actions (Region Selector & Wallet Button) */}
+        {/* Zone 3: Actions (Location Badge & Wallet Button) */}
         <div className="flex items-center gap-2 sm:gap-3 shrink-0">
-          {/* Region selector dropdown */}
-          <div className="relative">
-            <button
-              onClick={() => setRegionDropdownOpen(!regionDropdownOpen)}
-              className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-slate-200 text-xs font-medium text-slate-700 bg-white hover:bg-slate-50 transition-colors cursor-pointer"
-            >
-              <Globe className="w-3.5 h-3.5 text-slate-500" />
-              <span className="hidden sm:inline">{currentRegion.city}</span>
-              <span className="font-mono font-semibold">{currentRegion.currencySymbol}</span>
-              <ChevronDown className="w-3 h-3 text-slate-400" />
-            </button>
-
-            {regionDropdownOpen && (
-              <>
-                <div 
-                  className="fixed inset-0 z-40" 
-                  onClick={() => setRegionDropdownOpen(false)} 
-                />
-                <div className="absolute right-0 mt-1 w-64 bg-white rounded-xl shadow-lg border border-slate-200 py-1.5 z-50">
-                  <div className="px-3 py-1 text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
-                    Select Cafe Region
-                  </div>
-                  {regions.map((r) => (
-                    <button
-                      key={r.id}
-                      onClick={() => {
-                        onSelectRegion(r.id);
-                        setRegionDropdownOpen(false);
-                      }}
-                      className={`w-full text-left px-3 py-2 text-xs flex items-center justify-between hover:bg-slate-50 transition-colors cursor-pointer ${
-                        r.id === currentRegion.id ? 'bg-indigo-50/70 text-indigo-900 font-semibold' : 'text-slate-700'
-                      }`}
-                    >
-                      <div>
-                        <div className="font-medium text-slate-900">{r.name}</div>
-                        <div className="text-[11px] text-slate-500">{r.city}, {r.country} · {r.edgeNode}</div>
-                      </div>
-                      <span className="font-mono font-bold text-slate-900">{r.currencySymbol} {r.currencyCode}</span>
-                    </button>
-                  ))}
-                </div>
-              </>
-            )}
+          {/* Static Location Badge for Nuzvidu */}
+          <div className="hidden sm:inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-emerald-50 border border-emerald-200 text-xs font-semibold text-emerald-800">
+            <MapPin className="w-3.5 h-3.5 text-emerald-600" />
+            <span>Nuzvidu</span>
           </div>
 
-          {/* Integrated Wallet Balance Quick CTA */}
+          {/* Integrated Wallet Balance Quick CTA in INR */}
           <button
             onClick={onOpenTopUp}
-            className="inline-flex items-center gap-2 px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-semibold shadow-xs transition-colors cursor-pointer"
+            className="inline-flex items-center gap-2 px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-semibold shadow-xs transition-colors cursor-pointer"
           >
-            <Wallet className="w-3.5 h-3.5 text-indigo-200" />
+            <Wallet className="w-3.5 h-3.5 text-emerald-200" />
             <div className="text-left">
-              <span className="hidden sm:inline text-indigo-200 text-[10px] block leading-none">Wallet</span>
-              <span className="font-mono tabular-nums leading-none block">
+              <span className="hidden sm:inline text-emerald-200 text-[10px] block leading-none">Wallet</span>
+              <span className="font-mono tabular-nums leading-none block font-bold">
                 {formatCurrency(walletBalanceUSD, currentRegion)}
               </span>
             </div>
-            <span className="w-4 h-4 rounded bg-indigo-500/80 flex items-center justify-center text-[11px] font-bold">+</span>
+            <span className="w-4 h-4 rounded bg-emerald-500/80 flex items-center justify-center text-[11px] font-bold">+</span>
           </button>
         </div>
       </div>
@@ -239,7 +207,7 @@ export const TopNav: React.FC<TopNavProps> = ({
         <button
           onClick={() => setActiveTab('upload')}
           className={`px-2.5 py-1 rounded font-medium whitespace-nowrap ${
-            activeTab === 'upload' ? 'bg-white shadow-xs text-indigo-700 font-semibold' : 'text-slate-600'
+            activeTab === 'upload' ? 'bg-white shadow-xs text-emerald-700 font-semibold' : 'text-slate-600'
           }`}
         >
           Upload
@@ -247,15 +215,15 @@ export const TopNav: React.FC<TopNavProps> = ({
         <button
           onClick={() => setActiveTab('tracker')}
           className={`px-2.5 py-1 rounded font-medium whitespace-nowrap relative ${
-            activeTab === 'tracker' ? 'bg-white shadow-xs text-emerald-700 font-semibold' : 'text-slate-600'
+            activeTab === 'tracker' ? 'bg-white shadow-xs text-indigo-700 font-semibold' : 'text-slate-600'
           }`}
         >
-          Tracker {activeJobsCount > 0 ? `(${activeJobsCount})` : ''}
+          Spooler {activeJobsCount > 0 ? `(${activeJobsCount})` : ''}
         </button>
         <button
           onClick={() => setActiveTab('history')}
           className={`px-2.5 py-1 rounded font-medium whitespace-nowrap ${
-            activeTab === 'history' ? 'bg-white shadow-xs text-indigo-700 font-semibold' : 'text-slate-600'
+            activeTab === 'history' ? 'bg-white shadow-xs text-slate-900 font-semibold' : 'text-slate-600'
           }`}
         >
           History

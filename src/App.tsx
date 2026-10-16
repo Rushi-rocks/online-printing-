@@ -27,6 +27,7 @@ import { AdminDashboardView } from './components/AdminDashboardView';
 import { FeedbackView } from './components/FeedbackView';
 import { TopUpModal } from './components/TopUpModal';
 import { StationQrModal } from './components/StationQrModal';
+import { CameraQrScannerModal } from './components/CameraQrScannerModal';
 import { FeedbackModal } from './components/FeedbackModal';
 import { PrinterHardwareModal } from './components/PrinterHardwareModal';
 import { RealWorldDeploymentGuideModal } from './components/RealWorldDeploymentGuideModal';
@@ -34,30 +35,30 @@ import { PrintHistoryView } from './components/PrintHistoryView';
 import confetti from 'canvas-confetti';
 
 export default function App() {
-  // Query parameters parsing for station & region (Default to Indian Bengaluru Cyber Lounge)
+  // Query parameters parsing for station (Default to SYA Net World Desk-01)
   const [stationId, setStationId] = React.useState<string>(() => {
     if (typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search);
-      return params.get('station') || 'Station-03';
+      const st = params.get('station');
+      if (st) return st;
     }
-    return 'Station-03';
+    return 'Desk-01';
   });
 
-  const [regionId, setRegionId] = React.useState<RegionId>(() => {
-    if (typeof window !== 'undefined') {
-      const params = new URLSearchParams(window.location.search);
-      const r = params.get('region') as RegionId;
-      if (r && REGIONS.some((reg) => reg.id === r)) return r;
-    }
-    return 'bengaluru';
-  });
-
-  const currentRegion = React.useMemo(() => {
-    return REGIONS.find((r) => r.id === regionId) || REGIONS[0];
-  }, [regionId]);
+  // Single region: SYAM NET WORLD (Nuzvidu, Andhra Pradesh, India)
+  const regionId: RegionId = 'syam_nuzvidu';
+  const currentRegion = REGIONS[0];
 
   // Main navigation tab
-  const [activeTab, setActiveTab] = React.useState<'upload' | 'tracker' | 'history' | 'wallet' | 'admin' | 'feedback'>('upload');
+  const [activeTab, setActiveTab] = React.useState<'upload' | 'tracker' | 'history' | 'wallet' | 'admin' | 'feedback'>(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('mode') === 'upload' || params.get('station')) {
+        return 'upload';
+      }
+    }
+    return 'upload';
+  });
 
   // Core App State
   const [printers, setPrinters] = React.useState<Printer[]>(INITIAL_PRINTERS);
@@ -69,6 +70,7 @@ export default function App() {
   // Modals
   const [topUpModalOpen, setTopUpModalOpen] = React.useState<boolean>(false);
   const [qrModalOpen, setQrModalOpen] = React.useState<boolean>(false);
+  const [cameraScannerOpen, setCameraScannerOpen] = React.useState<boolean>(false);
   const [feedbackModalJob, setFeedbackModalJob] = React.useState<PrintJob | null>(null);
   const [hardwareModalPrinter, setHardwareModalPrinter] = React.useState<Printer | null>(null);
   const [deploymentGuideOpen, setDeploymentGuideOpen] = React.useState<boolean>(false);
@@ -193,7 +195,7 @@ export default function App() {
     const newJob: PrintJob = {
       id: newJobId,
       pickupPin: randomPin,
-      customerName: customerName || 'Cafe Customer',
+      customerName: customerName || 'Nuzvidu Customer',
       stationId,
       regionId,
       document: doc,
@@ -239,7 +241,7 @@ export default function App() {
             amountUSD: -quote.totalPriceUSD,
             amountLocal: -quote.totalPriceLocal,
             currencySymbol: currentRegion.currencySymbol,
-            description: `Direct UPI/Tap Payment: #${newJobId} (${doc.name})`,
+            description: `Direct UPI Payment: #${newJobId} (${doc.name})`,
             timestamp: Date.now(),
             jobId: newJobId,
             paymentMethod: 'UPI / PhonePe / GPay',
@@ -261,10 +263,7 @@ export default function App() {
 
   // Handler for Wallet Top-Up
   const handleTopUp = (amountUSD: number, paymentMethod: string) => {
-    const localAmount =
-      currentRegion.currencyCode === 'INR' || currentRegion.currencyCode === 'JPY'
-        ? Math.round(amountUSD * currentRegion.exchangeRateToUSD)
-        : Number((amountUSD * currentRegion.exchangeRateToUSD).toFixed(2));
+    const localAmount = Math.round(amountUSD * currentRegion.exchangeRateToUSD);
 
     setWallet((prev) => ({
       balanceUSD: Number((prev.balanceUSD + amountUSD).toFixed(2)),
@@ -275,7 +274,7 @@ export default function App() {
           amountUSD,
           amountLocal: localAmount,
           currencySymbol: currentRegion.currencySymbol,
-          description: `Instant Top-Up via ${paymentMethod.replace('_', ' ').toUpperCase()}`,
+          description: `Instant UPI Recharge via ${paymentMethod.replace('_', ' ').toUpperCase()}`,
           timestamp: Date.now(),
           paymentMethod,
         },
@@ -361,7 +360,7 @@ export default function App() {
     setActiveTab('tracker');
   };
 
-  // Re-Order job from Print History with fresh dynamic pricing & spooling
+  // Re-Order job from Print History
   const handleReorderJob = (
     doc: UploadedDocument,
     prefs: PrintPreferences,
@@ -393,7 +392,7 @@ export default function App() {
     const newJob: PrintJob = {
       id: newJobId,
       pickupPin: randomPin,
-      customerName: customerName || 'Cafe Customer',
+      customerName: customerName || 'Nuzvidu Customer',
       stationId,
       regionId,
       document: doc,
@@ -553,9 +552,8 @@ export default function App() {
         setActiveTab={setActiveTab}
         walletBalanceUSD={wallet.balanceUSD}
         currentRegion={currentRegion}
-        regions={REGIONS}
-        onSelectRegion={(reg) => setRegionId(reg)}
         onOpenQrModal={() => setQrModalOpen(true)}
+        onOpenLiveScanner={() => setCameraScannerOpen(true)}
         onOpenTopUp={() => setTopUpModalOpen(true)}
         activeJobsCount={activeQueueCount}
         stationId={stationId}
@@ -573,6 +571,7 @@ export default function App() {
             walletBalanceUSD={wallet.balanceUSD}
             onOpenTopUp={() => setTopUpModalOpen(true)}
             onOpenQrModal={() => setQrModalOpen(true)}
+            onOpenLiveScanner={() => setCameraScannerOpen(true)}
             onSubmitJob={handleSubmitJob}
           />
         )}
@@ -645,20 +644,20 @@ export default function App() {
       <footer className="border-t border-slate-200 bg-white py-6 px-4 sm:px-6 text-xs text-slate-500">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
           <div className="flex items-center gap-2">
-            <span className="font-semibold text-slate-700">NetPrint Hub Engine</span>
+            <span className="font-bold text-slate-800">SYAM NET WORLD</span>
             <span>·</span>
-            <span>Indian Cyber Cafe & Xerox Infrastructure</span>
+            <span>Nuzvidu Cyber Cafe & Digital Xerox Infrastructure</span>
             <span>·</span>
-            <span className="font-mono text-emerald-600">Edge Node: {currentRegion.edgeNode}</span>
+            <span className="font-mono text-emerald-600">Local Spooler Active (2ms)</span>
           </div>
           <div className="flex items-center gap-3">
-            <span>Terminal Desk: <strong className="font-mono text-slate-800">{stationId}</strong></span>
+            <span>Terminal: <strong className="font-mono text-slate-800">{stationId}</strong></span>
             <span>·</span>
             <button
               onClick={() => setDeploymentGuideOpen(true)}
-              className="text-indigo-600 hover:text-indigo-800 font-semibold underline cursor-pointer"
+              className="text-emerald-700 hover:text-emerald-900 font-semibold underline cursor-pointer"
             >
-              Hardware & IP Setup Guide
+              Hardware & IP Guide
             </button>
           </div>
         </div>
@@ -679,6 +678,27 @@ export default function App() {
         stationId={stationId}
         onSelectStation={(st) => setStationId(st)}
         currentRegion={currentRegion}
+        onOpenLiveScanner={() => {
+          setQrModalOpen(false);
+          setCameraScannerOpen(true);
+        }}
+        onOpenUploadDirectly={() => {
+          setQrModalOpen(false);
+          setActiveTab('upload');
+        }}
+      />
+
+      <CameraQrScannerModal
+        isOpen={cameraScannerOpen}
+        onClose={() => setCameraScannerOpen(false)}
+        onScanSuccess={(scannedStation) => {
+          setStationId(scannedStation);
+          setActiveTab('upload');
+          confetti({
+            particleCount: 50,
+            spread: 60,
+          });
+        }}
       />
 
       <FeedbackModal

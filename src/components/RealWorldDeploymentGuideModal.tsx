@@ -39,7 +39,7 @@ const http = require('http');
 const CONFIG = {
   // Your NetPrint Cloud Webhook/WebSocket Endpoint
   CLOUD_WS_URL: 'wss://ais-dev-33tte4hbmicu7j5a6iasvi-717924429741.asia-northeast1.run.app/api/spooler',
-  CAFE_BRANCH_ID: 'bengaluru-indiranagar',
+  CAFE_BRANCH_ID: 'syam-net-world-nuzvidu',
   API_SECRET_KEY: 'netprint_secret_token_123',
   
   // Local Printer LAN IP Map
@@ -256,7 +256,7 @@ console.log('Listening for customer print jobs...');
                     Generate an instant UPI deep link string on the customer's phone:
                   </p>
                   <code className="block bg-slate-100 p-2 rounded font-mono text-[10px] text-indigo-900 break-all">
-                    upi://pay?pa=yourcafe@okhdfcbank&pn=NetPrint+Indiranagar&am=14.00&cu=INR&tn=Job-JOB-9420
+                    upi://pay?pa=syamnetworld@okhdfcbank&pn=SYAM+Net+World+Nuzvidu&am=14.00&cu=INR&tn=Job-JOB-9420
                   </code>
                   <p className="text-[11px] text-slate-500 mt-2">
                     When tapped on mobile, opens Google Pay, PhonePe, or Paytm with the exact amount pre-filled!

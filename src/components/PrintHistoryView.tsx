@@ -761,7 +761,7 @@ export const PrintHistoryView: React.FC<PrintHistoryViewProps> = ({
             <div className="p-6 border-b border-slate-100 flex items-center justify-between bg-slate-50/60">
               <div className="flex items-center gap-2">
                 <Printer className="w-5 h-5 text-indigo-600" />
-                <span className="font-bold text-slate-900 text-sm">NetPrint Cafe Official Tax Receipt</span>
+                <span className="font-bold text-slate-900 text-sm">SYAM NET WORLD Official Tax Receipt</span>
               </div>
               <button
                 onClick={() => setReceiptJob(null)}
@@ -773,7 +773,7 @@ export const PrintHistoryView: React.FC<PrintHistoryViewProps> = ({
 
             <div className="p-6 space-y-4 text-xs font-mono">
               <div className="text-center pb-3 border-b border-dashed border-slate-300">
-                <div className="font-bold text-base font-sans text-slate-900">NETPRINT CYBER CAFE & XEROX</div>
+                <div className="font-bold text-base font-sans text-slate-900">SYAM NET WORLD & XEROX</div>
                 <div className="text-[11px] text-slate-500 font-sans mt-0.5">{currentRegion.name}</div>
                 <div className="text-[10px] text-slate-400">GSTIN: 29AAAAA0000A1Z5 · SAC: 998314</div>
               </div>

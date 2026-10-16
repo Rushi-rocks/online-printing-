@@ -1,4 +1,4 @@
-export type RegionId = 'bengaluru' | 'hyderabad' | 'mumbai' | 'delhi' | 'tokyo' | 'san_francisco' | 'london';
+export type RegionId = 'syam_nuzvidu';
 
 export interface Region {
   id: RegionId;
